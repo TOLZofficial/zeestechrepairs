@@ -64,52 +64,47 @@
 <body>
   <div class="box">
     <h2>Admin Login</h2>
-    <p>Use your secure Netlify Identity login to access the dashboard.</p>
-    <div class="actions">
-      <button id="loginBtn" type="button">Login with Netlify</button>
-    </div>
-    <div class="hint">Only invited admins can sign in.</div>
+    <p>Sign in to manage repair requests.</p>
+    <form id="loginForm">
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" type="email" placeholder="you@example.com" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" placeholder="Enter your password" autocomplete="current-password" required>
+      </div>
+      <div class="actions">
+        <button type="submit">Login</button>
+      </div>
+    </form>
+    <div class="hint">Admins are managed in Supabase Auth.</div>
   </div>
 
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const identityHash = window.location.hash || "";
-    const identityMode = identityHash.includes('recovery_token')
-      ? 'recovery'
-      : identityHash.includes('invite_token')
-        ? 'signup'
-        : null;
+    const supabaseUrl = "https://vdtqfwnlhqokpedojjlw.supabase.co";
+    const supabaseKey = "REPLACE_WITH_NEW_ANON_KEY";
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
-    const openIdentity = (mode) => {
-      if (window.netlifyIdentity) {
-        netlifyIdentity.open(mode);
+    const form = document.getElementById('loginForm');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const { error } = await supabaseClient.auth.signInWithPassword({
+        email: emailInput.value.trim(),
+        password: passwordInput.value
+      });
+
+      if (error) {
+        alert(error.message);
+        return;
       }
-    };
 
-    if (window.netlifyIdentity) {
-      netlifyIdentity.on('init', (user) => {
-        if (user) {
-          window.location.href = "admin.html";
-          return;
-        }
-        if (identityMode) {
-          openIdentity(identityMode);
-        }
-      });
-
-      document.getElementById('loginBtn').addEventListener('click', () => {
-        openIdentity();
-      });
-
-      netlifyIdentity.on('login', () => {
-        netlifyIdentity.close();
-        window.location.href = "admin.html";
-      });
-
-      netlifyIdentity.init();
-    } else {
-      alert("Netlify Identity failed to load. Check your connection and reload.");
-    }
+      window.location.href = "admin.html";
+    });
   </script>
 </body>
 </html>

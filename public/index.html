@@ -449,56 +449,13 @@
     Chat on WhatsApp
   </a>
 
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    const identityHash = window.location.hash || "";
-    const identityMode = identityHash.includes('recovery_token')
-      ? 'recovery'
-      : identityHash.includes('invite_token')
-        ? 'signup'
-        : null;
-
-    const openIdentity = () => {
-      if (identityMode && window.netlifyIdentity) {
-        netlifyIdentity.open(identityMode);
-      }
-    };
-
-    if (window.netlifyIdentity) {
-      netlifyIdentity.on('init', (user) => {
-        if (!user) {
-          openIdentity();
-        }
-      });
-
-      netlifyIdentity.on('login', () => {
-        netlifyIdentity.close();
-        window.location.href = "admin.html";
-      });
-
-      netlifyIdentity.init();
-    }
-
-    if (identityMode) {
-      let attempts = 0;
-      const timer = setInterval(() => {
-        attempts += 1;
-        if (window.netlifyIdentity) {
-          openIdentity();
-          clearInterval(timer);
-        } else if (attempts > 20) {
-          clearInterval(timer);
-        }
-      }, 250);
-    }
-  </script>
   <script>
     // Initialize EmailJS
     emailjs.init('fCmkDLIBoadNfuW_P');
 
     const supabaseUrl = "https://vdtqfwnlhqokpedojjlw.supabase.co";
-    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZkdHFmd25saHFva3BlZG9qamx3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYyNDEyODAsImV4cCI6MjA4MTgxNzI4MH0.L6WF43wLUOfRQCuiNVwr1WKL8J29Cj0wjnCE4TAs6t0";
+    const supabaseKey = "REPLACE_WITH_NEW_ANON_KEY";
     const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
     document.getElementById('year').textContent = new Date().getFullYear();

@@ -175,7 +175,7 @@
     </div>
   </main>
 
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const emailEl = document.getElementById('userEmail');
     const logoutBtn = document.getElementById('logoutBtn');
@@ -260,63 +260,35 @@
       });
     }
 
-    async function getAuthToken() {
-      const user = netlifyIdentity.currentUser();
-      if (!user) {
-        return null;
-      }
-      if (user.token && user.token.access_token) {
-        return user.token.access_token;
-      }
-      if (typeof user.jwt === 'function') {
-        return await user.jwt();
-      }
-      return null;
-    }
+    const supabaseUrl = "https://vdtqfwnlhqokpedojjlw.supabase.co";
+    const supabaseKey = "REPLACE_WITH_NEW_ANON_KEY";
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
     async function loadRequests() {
       requestsMeta.textContent = "Loading requests...";
-      const token = await getAuthToken();
-      if (!token) {
-        requestsMeta.textContent = "Session expired. Please log in again.";
-        return;
-      }
+      const { data, error } = await supabaseClient
+        .from('requests')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-      const response = await fetch('/.netlify/functions/requests', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      if (!response.ok) {
-        console.error(await response.text());
+      if (error) {
+        console.error(error);
         requestsMeta.textContent = "Failed to load requests.";
         return;
       }
 
-      const data = await response.json();
-      renderRequests(Array.isArray(data) ? data : []);
+      renderRequests(data || []);
     }
 
     async function updateStatus(id, status) {
-      const token = await getAuthToken();
-      if (!token) {
-        alert("Session expired. Please log in again.");
-        return;
-      }
+      const { error } = await supabaseClient
+        .from('requests')
+        .update({ status })
+        .eq('id', id);
 
-      const response = await fetch('/.netlify/functions/requests', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ id, status })
-      });
-
-      if (!response.ok) {
+      if (error) {
         alert("Failed to update status.");
-        console.error(await response.text());
+        console.error(error);
         return;
       }
 
@@ -324,52 +296,33 @@
     }
 
     async function deleteRequest(id) {
-      const token = await getAuthToken();
-      if (!token) {
-        alert("Session expired. Please log in again.");
-        return;
-      }
+      const { error } = await supabaseClient
+        .from('requests')
+        .delete()
+        .eq('id', id);
 
-      const response = await fetch('/.netlify/functions/requests', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ id })
-      });
-
-      if (!response.ok) {
+      if (error) {
         alert("Failed to delete request.");
-        console.error(await response.text());
+        console.error(error);
         return;
       }
 
       loadRequests();
     }
 
-    if (window.netlifyIdentity) {
-      netlifyIdentity.on('init', (user) => {
-        if (!user) {
-          window.location.href = "login.html";
-          return;
-        }
-        emailEl.textContent = user.email;
-        loadRequests();
-      });
-
-      netlifyIdentity.on('logout', () => {
+    supabaseClient.auth.getUser().then(({ data }) => {
+      if (!data || !data.user) {
         window.location.href = "login.html";
-      });
+        return;
+      }
+      emailEl.textContent = data.user.email || "Signed in";
+      loadRequests();
+    });
 
-      logoutBtn.addEventListener('click', () => {
-        netlifyIdentity.logout();
-      });
-
-      netlifyIdentity.init();
-    } else {
+    logoutBtn.addEventListener('click', async () => {
+      await supabaseClient.auth.signOut();
       window.location.href = "login.html";
-    }
+    });
 
     requestsEl.addEventListener('click', (event) => {
       const button = event.target.closest('button');
