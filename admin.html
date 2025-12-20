@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Zee – Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+    import { getFirestore, collection, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCe7RcWkEJbwbPCQ43QisnBxoxd2yFdNis",
+      authDomain: "zee-s-tech-repairs-1aa8b.firebaseapp.com",
+      projectId: "zee-s-tech-repairs-1aa8b",
+      storageBucket: "zee-s-tech-repairs-1aa8b.firebasestorage.app",
+      messagingSenderId: "698809928696",
+      appId: "1:698809928696:web:8c067ecd363de28ae5240d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // 🔒 PROTECT ADMIN PAGE
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        // Redirect to the login page if not signed in
+        window.location.href = "/login";
+      } else {
+        // If signed in, load the data
+        loadBookings();
+      }
+    });
+
+    // 🚪 LOGOUT
+    window.logout = async () => {
+      await signOut(auth);
+      // Fixed: changed from /admin-login.html to /login
+      window.location.href = "/login";
+    };
+
+    // 📥 LOAD BOOKINGS
+    async function loadBookings() {
+      const list = document.getElementById("bookings");
+      list.innerHTML = "";
+
+      try {
+        const querySnapshot = await getDocs(collection(db, "bookings"));
+        
+        if (querySnapshot.empty) {
+            list.innerHTML = "<p style='padding:20px;'>No bookings found yet.</p>";
+            return;
+        }
+
+        querySnapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          const div = document.createElement("div");
+          div.className = "card";
+
+          div.innerHTML = `
+            <h3>${data.name || 'No Name'}</h3>
+            <p><b>Email:</b> ${data.email || 'N/A'}</p>
+            <p><b>Phone:</b> ${data.phone || 'N/A'}</p>
+            <p><b>Device:</b> ${data.device || 'N/A'}</p>
+            <p><b>Issue:</b> ${data.problem || 'N/A'}</p>
+            <p><b>Status:</b> ${data.status || "Pending"}</p>
+
+            <button onclick="markDone('${docSnap.id}')">✅ Complete</button>
+            <button class="danger" onclick="removeBooking('${docSnap.id}')">🗑 Delete</button>
+          `;
+
+          list.appendChild(div);
+        });
+      } catch (error) {
+        console.error("Error loading bookings:", error);
+        list.innerHTML = "<p style='color:red; padding:20px;'>Error loading data. Check console.</p>";
+      }
+    }
+
+    // ✅ MARK COMPLETE
+    window.markDone = async (id) => {
+      try {
+        await updateDoc(doc(db, "bookings", id), { status: "Completed" });
+        loadBookings(); // Reload to show new status
+      } catch (error) {
+        alert("Error updating: " + error.message);
+      }
+    };
+
+    // 🗑 DELETE
+    window.removeBooking = async (id) => {
+      if (confirm("Delete this booking?")) {
+        try {
+          await deleteDoc(doc(db, "bookings", id));
+          loadBookings(); // Reload to remove from list
+        } catch (error) {
+          alert("Error deleting: " + error.message);
+        }
+      }
+    };
+  </script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: #0b0f14;
+      color: #fff;
+    }
+
+    header {
+      background: linear-gradient(90deg, #2fffdc, #ff7ac6);
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #000;
+    }
+
+    main {
+      padding: 20px;
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: #141a22;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 0 20px rgba(47,255,220,.1);
+    }
+
+    .card h3 {
+      margin-top: 0;
+      color: #2fffdc;
+    }
+
+    .card p {
+      margin: 8px 0;
+      font-size: 14px;
+    }
+
+    button {
+      background: #2fffdc;
+      color: #000;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-right: 8px;
+      margin-top: 12px;
+      font-weight: bold;
+    }
+
+    button:hover {
+      opacity: 0.8;
+    }
+
+    button.danger {
+      background: #ff7ac6;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📊 Admin Dashboard</h1>
+    <button onclick="logout()">🚪 Logout</button>
+  </header>
+
+  <main>
+    <h2>📋 Bookings</h2>
+    <div id="bookings" class="grid"></div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Login | Zee</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #0f172a;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .box {
+      background: #020617;
+      padding: 30px;
+      border-radius: 12px;
+      width: 300px;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+    }
+    button {
+      background: turquoise;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="box">
+  <h2>Admin Login</h2>
+  <input id="email" type="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+<script>
+  firebase.initializeApp({
+    apiKey: "AIzaSyCe7RcWkEJbwbPCQ43QisnBxoxd2yFdNis",
+    authDomain: "zee-s-tech-repairs-1aa8b.firebaseapp.com",
+    projectId: "zee-s-tech-repairs-1aa8b"
+  });
+
+  function login() {
+    firebase.auth().signInWithEmailAndPassword(
+      email.value,
+      password.value
+    ).then(() => {
+      window.location.href = "/admin";
+
+    }).catch(err => {
+      alert(err.message);
+    });
+  }
+</script>
+
+</body>
+</html>
