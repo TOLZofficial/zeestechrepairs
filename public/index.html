@@ -369,7 +369,13 @@
           <input type="email" id="email" name="from_email" placeholder="Your Email" required />
         </div>
         <div class="form-group">
-          <textarea id="message" name="message" placeholder="Tell us about your repair needs..." required></textarea>
+          <input type="tel" id="phone" name="phone" placeholder="Your Phone Number" required />
+        </div>
+        <div class="form-group">
+          <input type="text" id="device" name="device" placeholder="Device Type (phone, laptop, etc.)" required />
+        </div>
+        <div class="form-group">
+          <textarea id="message" name="message" placeholder="Describe the issue..." required></textarea>
         </div>
         <button type="submit" class="btn" style="align-self: flex-start;">Send Message</button>
       </form>
@@ -381,6 +387,7 @@
   </footer>
 
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const identityHash = window.location.hash || "";
     const identityMode = identityHash.includes('recovery_token')
@@ -426,6 +433,10 @@
   <script>
     // Initialize EmailJS
     emailjs.init('fCmkDLIBoadNfuW_P');
+
+    const supabaseUrl = "https://vdtqfwnlhqokpedojjlw.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZkdHFmd25saHFva3BlZG9qamx3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYyNDEyODAsImV4cCI6MjA4MTgxNzI4MH0.L6WF43wLUOfRQCuiNVwr1WKL8J29Cj0wjnCE4TAs6t0";
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
     document.getElementById('year').textContent = new Date().getFullYear();
 
@@ -481,20 +492,41 @@
     });
 
     // Handle contact form submission
-    document.getElementById('contactForm').addEventListener('submit', function(e) {
+    document.getElementById('contactForm').addEventListener('submit', async function(e) {
       e.preventDefault();
-      emailjs.send('service_dnev7uf', 'template_7u5vr2l', {
-        from_name: document.getElementById('name').value,
-        from_email: document.getElementById('email').value,
-        message: document.getElementById('message').value,
-        to_email: 'contact@zeestechrepairs.com'
-      }).then(function() {
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const device = document.getElementById('device').value.trim();
+      const issue = document.getElementById('message').value.trim();
+
+      try {
+        const { error } = await supabaseClient.from('requests').insert([{
+          name,
+          email,
+          phone,
+          device,
+          issue,
+          status: 'Pending'
+        }]);
+
+        if (error) {
+          throw error;
+        }
+
+        await emailjs.send('service_dnev7uf', 'template_7u5vr2l', {
+          from_name: name,
+          from_email: email,
+          message: `Phone: ${phone}\nDevice: ${device}\nIssue: ${issue}`,
+          to_email: 'contact@zeestechrepairs.com'
+        });
+
         alert('Message sent successfully!');
         document.getElementById('contactForm').reset();
-      }).catch(function(error) {
+      } catch (error) {
         alert('Failed to send message. Please try again.');
         console.error(error);
-      });
+      }
     });
   </script>
 </body>

@@ -42,6 +42,59 @@
       gap: 16px;
     }
 
+    .requests {
+      display: grid;
+      gap: 14px;
+    }
+
+    .request {
+      background: #111720;
+      border-radius: 12px;
+      padding: 14px;
+      border: 1px solid rgba(47, 255, 220, 0.12);
+      display: grid;
+      gap: 10px;
+    }
+
+    .request-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .request-meta {
+      display: grid;
+      gap: 6px;
+      font-size: 13px;
+      color: #cfd9e2;
+    }
+
+    .status {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .status.pending {
+      background: rgba(255, 230, 120, 0.18);
+      color: #ffe678;
+    }
+
+    .status.completed {
+      background: rgba(47, 255, 220, 0.18);
+      color: #2fffdc;
+    }
+
+    .request-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
     .card {
       background: #141a22;
       border-radius: 12px;
@@ -89,6 +142,16 @@
     button:hover {
       opacity: 0.85;
     }
+
+    button.secondary {
+      background: #1d2936;
+      color: #cfd9e2;
+      border: 1px solid rgba(207, 217, 226, 0.2);
+    }
+
+    button.danger {
+      background: #ff7ac6;
+    }
   </style>
 </head>
 <body>
@@ -105,26 +168,148 @@
       <p>This dashboard is protected by Netlify Identity. Only invited admins can access it.</p>
     </div>
 
-    <div class="grid">
-      <div class="card">
-        <h3>Contact form</h3>
-        <p>Messages from the homepage go through EmailJS. Check your EmailJS inbox for new requests.</p>
-      </div>
-      <div class="card">
-        <h3>Quick actions</h3>
-        <p>Need to update services or pricing? Edit <code>index.html</code> and redeploy.</p>
-      </div>
-      <div class="card">
-        <h3>Support</h3>
-        <p>If an admin needs access, invite them from the Netlify Identity tab.</p>
-      </div>
+    <div class="card">
+      <h3>Repair requests</h3>
+      <p id="requestsMeta">Loading requests...</p>
+      <div id="requests" class="requests"></div>
     </div>
   </main>
 
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const emailEl = document.getElementById('userEmail');
     const logoutBtn = document.getElementById('logoutBtn');
+    const requestsEl = document.getElementById('requests');
+    const requestsMeta = document.getElementById('requestsMeta');
+
+    const supabaseUrl = "https://vdtqfwnlhqokpedojjlw.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZkdHFmd25saHFva3BlZG9qamx3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYyNDEyODAsImV4cCI6MjA4MTgxNzI4MH0.L6WF43wLUOfRQCuiNVwr1WKL8J29Cj0wjnCE4TAs6t0";
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+    function formatDate(value) {
+      if (!value) {
+        return "Unknown time";
+      }
+      return new Date(value).toLocaleString();
+    }
+
+    function renderRequests(requests) {
+      requestsEl.innerHTML = "";
+
+      if (!requests.length) {
+        requestsMeta.textContent = "No requests yet.";
+        return;
+      }
+
+      requestsMeta.textContent = `${requests.length} request(s) total.`;
+
+      requests.forEach((request) => {
+        const card = document.createElement('div');
+        card.className = 'request';
+
+        const header = document.createElement('div');
+        header.className = 'request-header';
+
+        const title = document.createElement('strong');
+        title.textContent = request.name || 'No name';
+
+        const status = document.createElement('span');
+        const statusValue = (request.status || 'Pending').toLowerCase();
+        status.className = `status ${statusValue === 'completed' ? 'completed' : 'pending'}`;
+        status.textContent = request.status || 'Pending';
+
+        header.appendChild(title);
+        header.appendChild(status);
+
+        const meta = document.createElement('div');
+        meta.className = 'request-meta';
+
+        const addMetaLine = (label, value) => {
+          const line = document.createElement('span');
+          const strong = document.createElement('strong');
+          strong.textContent = `${label}:`;
+          line.appendChild(strong);
+          line.append(` ${value || 'N/A'}`);
+          meta.appendChild(line);
+        };
+
+        addMetaLine('Email', request.email);
+        addMetaLine('Phone', request.phone);
+        addMetaLine('Device', request.device);
+        addMetaLine('Issue', request.issue);
+        addMetaLine('Created', formatDate(request.created_at));
+
+        const actions = document.createElement('div');
+        actions.className = 'request-actions';
+
+        const completeBtn = document.createElement('button');
+        completeBtn.className = 'secondary';
+        completeBtn.textContent = 'Mark completed';
+        completeBtn.dataset.action = 'complete';
+        completeBtn.dataset.id = request.id;
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'danger';
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.dataset.action = 'delete';
+        deleteBtn.dataset.id = request.id;
+
+        actions.appendChild(completeBtn);
+        actions.appendChild(deleteBtn);
+
+        card.appendChild(header);
+        card.appendChild(meta);
+        card.appendChild(actions);
+        requestsEl.appendChild(card);
+      });
+    }
+
+    async function loadRequests() {
+      requestsMeta.textContent = "Loading requests...";
+      const { data, error } = await supabaseClient
+        .from('requests')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error(error);
+        requestsMeta.textContent = "Failed to load requests.";
+        return;
+      }
+
+      renderRequests(data || []);
+    }
+
+    async function updateStatus(id, status) {
+      const { error } = await supabaseClient
+        .from('requests')
+        .update({ status })
+        .eq('id', id);
+
+      if (error) {
+        alert("Failed to update status.");
+        console.error(error);
+        return;
+      }
+
+      loadRequests();
+    }
+
+    async function deleteRequest(id) {
+      const { error } = await supabaseClient
+        .from('requests')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        alert("Failed to delete request.");
+        console.error(error);
+        return;
+      }
+
+      loadRequests();
+    }
 
     if (window.netlifyIdentity) {
       netlifyIdentity.on('init', (user) => {
@@ -133,6 +318,7 @@
           return;
         }
         emailEl.textContent = user.email;
+        loadRequests();
       });
 
       netlifyIdentity.on('logout', () => {
@@ -147,6 +333,25 @@
     } else {
       window.location.href = "login.html";
     }
+
+    requestsEl.addEventListener('click', (event) => {
+      const button = event.target.closest('button');
+      if (!button) {
+        return;
+      }
+      const id = button.dataset.id;
+      if (!id) {
+        return;
+      }
+
+      if (button.dataset.action === 'complete') {
+        updateStatus(id, 'Completed');
+      } else if (button.dataset.action === 'delete') {
+        if (confirm('Delete this request?')) {
+          deleteRequest(id);
+        }
+      }
+    });
   </script>
 </body>
 </html>
