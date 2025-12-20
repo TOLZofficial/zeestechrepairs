@@ -236,6 +236,17 @@
       justify-content: space-between;
     }
 
+    .contact .extra-box {
+      background: rgba(15, 45, 61, 0.8);
+      border: 1px solid rgba(0, 212, 212, 0.25);
+      border-radius: 12px;
+      padding: 14px 16px;
+      color: var(--text);
+      font-weight: 600;
+      line-height: 1.5;
+      max-width: 320px;
+    }
+
     footer { text-align: center; color: var(--muted); padding: 32px 0 12px; }
 
     .form-group {
@@ -400,7 +411,13 @@
     <section class="contact" id="contact">
       <div>
         <h3>Ready to schedule?</h3>
-        <p style="margin: 4px 0 0; color: var(--muted);">Call or email and we'll confirm your slot.</p>
+        <p style="margin: 4px 0 0; color: var(--muted);">Call, email, or text and we'll confirm your slot.</p>
+        <div class="actions" style="margin-top: 12px;">
+          <a class="btn secondary" href="sms:+447424905889?body=Hi%20Zee%27s%20Tech%20Repairs!%20I%20need%20a%20quote%20for%20a%20repair.">Text us (SMS/iMessage/RCS)</a>
+        </div>
+      </div>
+      <div class="extra-box">
+        Email now to get a fast quote for a cheap price!
       </div>
       <form id="contactForm" style="display: flex; flex-direction: column; gap: 12px; flex: 1; max-width: 400px;">
         <div class="form-group">
