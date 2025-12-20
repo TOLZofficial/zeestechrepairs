@@ -273,6 +273,47 @@
       min-height: 100px;
     }
 
+    .whatsapp-widget {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 1000;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #25d366, #1ebe57);
+      color: #0b0f14;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 18px 40px rgba(37, 211, 102, 0.35);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .whatsapp-widget:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 22px 50px rgba(37, 211, 102, 0.45);
+    }
+
+    .whatsapp-icon {
+      width: 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(11, 15, 20, 0.15);
+    }
+
+    @media (max-width: 600px) {
+      .whatsapp-widget {
+        right: 14px;
+        bottom: 14px;
+        padding: 10px 14px;
+        font-size: 14px;
+      }
+    }
+
     section {
       scroll-margin-top: 80px;
     }
@@ -385,6 +426,11 @@
   <footer>
     &copy; <span id="year"></span> 2025 Zee's Tech Repairs - Rapid, reliable fixes.
   </footer>
+
+  <a class="whatsapp-widget" href="https://wa.me/447424905889?text=Hi%20Zee%27s%20Tech%20Repairs!%20I%20need%20help%20with%20a%20device%20repair." target="_blank" rel="noopener">
+    <span class="whatsapp-icon">WA</span>
+    Chat on WhatsApp
+  </a>
 
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
