@@ -382,15 +382,23 @@
 
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   <script>
+    const identityHash = window.location.hash || "";
+    const identityMode = identityHash.includes('recovery_token')
+      ? 'recovery'
+      : identityHash.includes('invite_token')
+        ? 'signup'
+        : null;
+
+    const openIdentity = () => {
+      if (identityMode && window.netlifyIdentity) {
+        netlifyIdentity.open(identityMode);
+      }
+    };
+
     if (window.netlifyIdentity) {
       netlifyIdentity.on('init', (user) => {
-        if (user) {
-          return;
-        }
-        if (window.location.hash.includes('recovery_token')) {
-          netlifyIdentity.open('recovery');
-        } else if (window.location.hash.includes('invite_token')) {
-          netlifyIdentity.open('signup');
+        if (!user) {
+          openIdentity();
         }
       });
 
@@ -400,6 +408,19 @@
       });
 
       netlifyIdentity.init();
+    }
+
+    if (identityMode) {
+      let attempts = 0;
+      const timer = setInterval(() => {
+        attempts += 1;
+        if (window.netlifyIdentity) {
+          openIdentity();
+          clearInterval(timer);
+        } else if (attempts > 20) {
+          clearInterval(timer);
+        }
+      }, 250);
     }
   </script>
   <script>

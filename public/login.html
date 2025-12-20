@@ -73,15 +73,32 @@
 
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   <script>
+    const identityHash = window.location.hash || "";
+    const identityMode = identityHash.includes('recovery_token')
+      ? 'recovery'
+      : identityHash.includes('invite_token')
+        ? 'signup'
+        : null;
+
+    const openIdentity = (mode) => {
+      if (window.netlifyIdentity) {
+        netlifyIdentity.open(mode);
+      }
+    };
+
     if (window.netlifyIdentity) {
       netlifyIdentity.on('init', (user) => {
         if (user) {
           window.location.href = "admin.html";
+          return;
+        }
+        if (identityMode) {
+          openIdentity(identityMode);
         }
       });
 
       document.getElementById('loginBtn').addEventListener('click', () => {
-        netlifyIdentity.open();
+        openIdentity();
       });
 
       netlifyIdentity.on('login', () => {
