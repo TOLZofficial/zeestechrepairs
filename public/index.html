@@ -380,6 +380,28 @@
     &copy; <span id="year"></span> 2025 Zee's Tech Repairs - Rapid, reliable fixes.
   </footer>
 
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <script>
+    if (window.netlifyIdentity) {
+      netlifyIdentity.on('init', (user) => {
+        if (user) {
+          return;
+        }
+        if (window.location.hash.includes('recovery_token')) {
+          netlifyIdentity.open('recovery');
+        } else if (window.location.hash.includes('invite_token')) {
+          netlifyIdentity.open('signup');
+        }
+      });
+
+      netlifyIdentity.on('login', () => {
+        netlifyIdentity.close();
+        window.location.href = "admin.html";
+      });
+
+      netlifyIdentity.init();
+    }
+  </script>
   <script>
     // Initialize EmailJS
     emailjs.init('fCmkDLIBoadNfuW_P');
