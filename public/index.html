@@ -454,7 +454,7 @@
 
         const element = entry.target;
         if (element.classList.contains('hero')) {
-          const children = element.querySelectorAll('> div');
+          const children = element.querySelectorAll(':scope > div');
           children[0]?.classList.add('animate', 'slideInLeft');
           children[1]?.classList.add('animate', 'slideInRight');
         } else if (element.classList.contains('card')) {
