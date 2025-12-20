@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Zee's Tech Repairs | Same-Day Device Fixes</title>
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <script type="text/javascript" src="emailjs.min.js"></script>
+  <style>
+    :root {
+      --bg: #0a1f2e;
+      --panel: #0f2d3d;
+      --accent: #00d4d4;
+      --accent-2: #ff6ec7;
+      --accent-3: #7fffb0;
+      --text: #e8f4f8;
+      --muted: #a0c4d4;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #051a24, var(--bg));
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes popIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .animate {
+      animation-duration: 0.8s;
+      animation-fill-mode: both;
+      animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .animate.fadeIn { animation-name: fadeIn; }
+    .animate.slideInUp { animation-name: slideInUp; }
+    .animate.slideInLeft { animation-name: slideInLeft; }
+    .animate.slideInRight { animation-name: slideInRight; }
+    .animate.popIn { animation-name: popIn; }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px;
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    .brand {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .brand img {
+      border-radius: 12px;
+      object-fit: cover;
+      box-shadow: 0 4px 12px rgba(0, 212, 212, 0.2);
+    }
+
+    nav a {
+      color: var(--text);
+      text-decoration: none;
+      margin-left: 16px;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+
+    nav a:hover { color: var(--accent); }
+
+    main { max-width: 1100px; margin: auto; padding: 0 24px 64px; }
+
+    .hero {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 32px;
+      align-items: center;
+      padding: 40px 0 24px;
+    }
+
+    .hero h1 { font-size: clamp(32px, 5vw, 46px); margin: 0 0 16px; }
+    .hero p { color: var(--muted); line-height: 1.6; margin: 0 0 24px; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(0, 212, 212, 0.2), rgba(127, 255, 176, 0.2));
+      color: var(--accent-3);
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      font-size: 12px;
+    }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+
+    .btn {
+      background: linear-gradient(135deg, var(--accent), var(--accent-3));
+      color: #000;
+      padding: 12px 18px;
+      border-radius: 10px;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 15px 40px rgba(0, 212, 212, 0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 20px 50px rgba(0, 212, 212, 0.5);
+    }
+
+    .btn.secondary {
+      background: transparent;
+      color: var(--text);
+      border: 2px solid var(--accent-2);
+      box-shadow: none;
+    }
+
+    .btn.secondary:hover {
+      background: rgba(255, 110, 199, 0.1);
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+      margin-top: 32px;
+    }
+
+    .card {
+      background: linear-gradient(135deg, rgba(0, 212, 212, 0.08), rgba(127, 255, 176, 0.08));
+      border: 1px solid rgba(0, 212, 212, 0.2);
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+      transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 30px 60px rgba(0, 212, 212, 0.25);
+      border-color: var(--accent-2);
+    }
+
+    .card h3 { margin: 0 0 8px; background: linear-gradient(135deg, var(--accent), var(--accent-3)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .card p { margin: 0; color: var(--muted); line-height: 1.5; }
+    .card ul { margin: 0; padding-left: 18px; color: var(--muted); line-height: 1.6; }
+    .card li { margin-bottom: 6px; }
+    .card li:last-child { margin-bottom: 0; }
+    .js-enabled .card-grid .card {
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+      transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .js-enabled .card-grid .card.is-visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .contact {
+      margin-top: 40px;
+      background: linear-gradient(120deg, rgba(0, 212, 212, 0.12), rgba(255, 110, 199, 0.12), rgba(127, 255, 176, 0.12));
+      border: 2px solid rgba(0, 212, 212, 0.3);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    footer { text-align: center; color: var(--muted); padding: 32px 0 12px; }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      background: rgba(0, 212, 212, 0.05);
+      border: 1px solid rgba(0, 212, 212, 0.2);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-family: inherit;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 12px rgba(0, 212, 212, 0.2);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    section {
+      scroll-margin-top: 80px;
+    }
+
+    section h2 {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2), var(--accent-3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 2.5rem;
+      margin-bottom: 32px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation: none !important;
+        transition: none !important;
+      }
+      html { scroll-behavior: auto; }
+      .js-enabled .card-grid .card { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <img src="logo.png" alt="Zee's Tech Repairs" width="48" height="48" />
+      <span>Zee's Tech Repairs</span>
+    </div>
+    <nav>
+      <a href="tel:+447424905889">Call Us</a>
+      <a href="#contact">Email</a>
+      <a href="login.html">Admin</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="hero">
+      <div>
+        <div class="badge">Same-Day Device Fixes</div>
+        <h1>Phones, tablets, and computers repaired with care.</h1>
+        <p>
+          Screen replacements, battery swaps, diagnostics, and data recovery from a
+          trusted local technician. We keep your devices running so you can keep moving.
+        </p>
+        <div class="actions">
+          <a class="btn" href="tel:+447424905889">&#x1F4DE; Book a repair</a>
+          <a class="btn secondary" href="#contact">&#x2709;&#xFE0F; Email us</a>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Why customers choose Zee</h3>
+        <ul>
+          <li>Genuine parts and careful workmanship</li>
+          <li>Transparent pricing before we start</li>
+          <li>On-site options available for quick fixes</li>
+          <li>Friendly updates every step of the way</li>
+        </ul>
+      </div>
+    </div>
+
+    <section>
+      <h2>Services</h2>
+      <div class="card-grid">
+        <div class="card">
+          <h3>Screen &amp; Display</h3>
+          <p>High-quality screen replacements for phones, tablets, and laptops.</p>
+        </div>
+        <div class="card">
+          <h3>Battery &amp; Power</h3>
+          <p>Battery swaps, charging port repairs, and power diagnostics.</p>
+        </div>
+        <div class="card">
+          <h3>Data &amp; Backups</h3>
+          <p>Data recovery, backup setup, and migration to new devices.</p>
+        </div>
+        <div class="card">
+          <h3>Software Tune-ups</h3>
+          <p>Malware cleanups, performance optimizations, and OS upgrades.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="contact" id="contact">
+      <div>
+        <h3>Ready to schedule?</h3>
+        <p style="margin: 4px 0 0; color: var(--muted);">Call or email and we'll confirm your slot.</p>
+      </div>
+      <form id="contactForm" style="display: flex; flex-direction: column; gap: 12px; flex: 1; max-width: 400px;">
+        <div class="form-group">
+          <input type="text" id="name" name="from_name" placeholder="Your Name" required />
+        </div>
+        <div class="form-group">
+          <input type="email" id="email" name="from_email" placeholder="Your Email" required />
+        </div>
+        <div class="form-group">
+          <textarea id="message" name="message" placeholder="Tell us about your repair needs..." required></textarea>
+        </div>
+        <button type="submit" class="btn" style="align-self: flex-start;">Send Message</button>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    &copy; <span id="year"></span> 2025 Zee's Tech Repairs - Rapid, reliable fixes.
+  </footer>
+
+  <script>
+    // Initialize EmailJS
+    emailjs.init('fCmkDLIBoadNfuW_P');
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Scroll Animation Observer
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver(function(entries) {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) {
+          return;
+        }
+
+        const element = entry.target;
+        if (element.classList.contains('hero')) {
+          const children = element.querySelectorAll('> div');
+          children[0]?.classList.add('animate', 'slideInLeft');
+          children[1]?.classList.add('animate', 'slideInRight');
+        } else if (element.classList.contains('card')) {
+          element.classList.add('animate', 'popIn');
+        } else if (element.classList.contains('contact')) {
+          element.classList.add('animate', 'slideInUp');
+        } else if (element.tagName === 'SECTION' && !element.classList.contains('contact')) {
+          const title = element.querySelector('h2');
+          title?.classList.add('animate', 'fadeIn');
+        }
+
+        observer.unobserve(element);
+      });
+    }, observerOptions);
+
+    // Observe all sections and cards
+    document.querySelectorAll('section, .hero, .contact').forEach(el => {
+      observer.observe(el);
+    });
+
+    document.querySelectorAll('.card-grid .card').forEach((card, idx) => {
+      card.style.animationDelay = `${idx * 0.15}s`;
+      observer.observe(card);
+    });
+
+    document.querySelectorAll('a[href^=\"#\"]').forEach((link) => {
+      link.addEventListener('click', (event) => {
+        const target = document.querySelector(link.getAttribute('href'));
+        if (!target) {
+          return;
+        }
+        event.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+
+    // Handle contact form submission
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      emailjs.send('service_dnev7uf', 'template_7u5vr2l', {
+        from_name: document.getElementById('name').value,
+        from_email: document.getElementById('email').value,
+        message: document.getElementById('message').value,
+        to_email: 'contact@zeestechrepairs.com'
+      }).then(function() {
+        alert('Message sent successfully!');
+        document.getElementById('contactForm').reset();
+      }).catch(function(error) {
+        alert('Failed to send message. Please try again.');
+        console.error(error);
+      });
+    });
+  </script>
+</body>
+</html>

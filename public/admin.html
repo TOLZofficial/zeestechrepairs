@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Zee's Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: #0b0f14;
+      color: #fff;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(90deg, #2fffdc, #ff7ac6);
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #000;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    main {
+      padding: 20px;
+      max-width: 1100px;
+      margin: auto;
+      display: grid;
+      gap: 18px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: #141a22;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 0 20px rgba(47, 255, 220, 0.1);
+      border: 1px solid rgba(47, 255, 220, 0.08);
+    }
+
+    .card h3 {
+      margin-top: 0;
+      color: #2fffdc;
+    }
+
+    .card p {
+      margin: 8px 0;
+      font-size: 14px;
+      color: #cfd9e2;
+      line-height: 1.5;
+    }
+
+    .pill {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      font-size: 12px;
+      background: rgba(47, 255, 220, 0.15);
+      color: #2fffdc;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    button {
+      background: #2fffdc;
+      color: #000;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      opacity: 0.85;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Zee's Admin Dashboard</h1>
+    <button id="logoutBtn" type="button">Logout</button>
+  </header>
+
+  <main>
+    <div class="pill">Signed in</div>
+    <div class="card">
+      <h3>Welcome back</h3>
+      <p>Signed in as: <span id="userEmail">Loading...</span></p>
+      <p>This dashboard is protected by Netlify Identity. Only invited admins can access it.</p>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h3>Contact form</h3>
+        <p>Messages from the homepage go through EmailJS. Check your EmailJS inbox for new requests.</p>
+      </div>
+      <div class="card">
+        <h3>Quick actions</h3>
+        <p>Need to update services or pricing? Edit <code>index.html</code> and redeploy.</p>
+      </div>
+      <div class="card">
+        <h3>Support</h3>
+        <p>If an admin needs access, invite them from the Netlify Identity tab.</p>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <script>
+    const emailEl = document.getElementById('userEmail');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    if (window.netlifyIdentity) {
+      netlifyIdentity.on('init', (user) => {
+        if (!user) {
+          window.location.href = "login.html";
+          return;
+        }
+        emailEl.textContent = user.email;
+      });
+
+      netlifyIdentity.on('logout', () => {
+        window.location.href = "login.html";
+      });
+
+      logoutBtn.addEventListener('click', () => {
+        netlifyIdentity.logout();
+      });
+
+      netlifyIdentity.init();
+    } else {
+      window.location.href = "login.html";
+    }
+  </script>
+</body>
+</html>

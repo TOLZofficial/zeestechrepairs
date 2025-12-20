@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Login | Zee</title>
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: radial-gradient(circle at top, #11233b, #070d1a 70%);
+      color: #eef6ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .box {
+      background: rgba(7, 14, 28, 0.92);
+      padding: 28px;
+      border-radius: 16px;
+      width: min(360px, 90vw);
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(84, 143, 255, 0.2);
+      text-align: center;
+    }
+    h2 {
+      margin: 0 0 6px;
+      font-size: 22px;
+    }
+    p {
+      margin: 0 0 18px;
+      color: #b9c7de;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .actions {
+      margin-top: 18px;
+    }
+    button {
+      width: 100%;
+      padding: 10px 12px;
+      height: 44px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(135deg, #41caff, #5bffb0);
+      color: #021014;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(73, 215, 255, 0.25);
+    }
+    .hint {
+      margin-top: 12px;
+      font-size: 12px;
+      color: #9fb3cc;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Admin Login</h2>
+    <p>Use your secure Netlify Identity login to access the dashboard.</p>
+    <div class="actions">
+      <button id="loginBtn" type="button">Login with Netlify</button>
+    </div>
+    <div class="hint">Only invited admins can sign in.</div>
+  </div>
+
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <script>
+    if (window.netlifyIdentity) {
+      netlifyIdentity.on('init', (user) => {
+        if (user) {
+          window.location.href = "admin.html";
+        }
+      });
+
+      document.getElementById('loginBtn').addEventListener('click', () => {
+        netlifyIdentity.open();
+      });
+
+      netlifyIdentity.on('login', () => {
+        netlifyIdentity.close();
+        window.location.href = "admin.html";
+      });
+
+      netlifyIdentity.init();
+    } else {
+      alert("Netlify Identity failed to load. Check your connection and reload.");
+    }
+  </script>
+</body>
+</html>
