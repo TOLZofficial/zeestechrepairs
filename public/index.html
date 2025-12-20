@@ -514,18 +514,25 @@
           throw error;
         }
 
-        await emailjs.send('service_dnev7uf', 'template_7u5vr2l', {
-          from_name: name,
-          from_email: email,
-          message: `Phone: ${phone}\nDevice: ${device}\nIssue: ${issue}`,
-          to_email: 'contact@zeestechrepairs.com'
-        });
+        try {
+          await emailjs.send('service_dnev7uf', 'template_7u5vr2l', {
+            from_name: name,
+            from_email: email,
+            message: `Phone: ${phone}\nDevice: ${device}\nIssue: ${issue}`,
+            to_email: 'contact@zeestechrepairs.com'
+          });
+        } catch (emailError) {
+          alert('Saved your request, but failed to send the email notification.');
+          console.error('EmailJS error:', emailError);
+          document.getElementById('contactForm').reset();
+          return;
+        }
 
         alert('Message sent successfully!');
         document.getElementById('contactForm').reset();
       } catch (error) {
-        alert('Failed to send message. Please try again.');
-        console.error(error);
+        alert('Failed to save your request. Please try again.');
+        console.error('Supabase error:', error);
       }
     });
   </script>
