@@ -1,0 +1,14 @@
+{
+  "name": "zeestechrepairs",
+  "version": "1.0.0",
+  "description": "Static site for Zees Tech Repairs",
+  "main": "index.js",
+  "scripts": {
+    "build": "rm -rf dist && mkdir -p dist && cp *.html dist/ && cp *.png dist/",
+    "test": "echo \"No automated tests configured\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
