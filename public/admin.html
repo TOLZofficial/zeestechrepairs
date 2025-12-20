@@ -176,16 +176,11 @@
   </main>
 
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const emailEl = document.getElementById('userEmail');
     const logoutBtn = document.getElementById('logoutBtn');
     const requestsEl = document.getElementById('requests');
     const requestsMeta = document.getElementById('requestsMeta');
-
-    const supabaseUrl = "https://vdtqfwnlhqokpedojjlw.supabase.co";
-    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZkdHFmd25saHFva3BlZG9qamx3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYyNDEyODAsImV4cCI6MjA4MTgxNzI4MH0.L6WF43wLUOfRQCuiNVwr1WKL8J29Cj0wjnCE4TAs6t0";
-    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
     function formatDate(value) {
       if (!value) {
@@ -265,31 +260,63 @@
       });
     }
 
+    async function getAuthToken() {
+      const user = netlifyIdentity.currentUser();
+      if (!user) {
+        return null;
+      }
+      if (user.token && user.token.access_token) {
+        return user.token.access_token;
+      }
+      if (typeof user.jwt === 'function') {
+        return await user.jwt();
+      }
+      return null;
+    }
+
     async function loadRequests() {
       requestsMeta.textContent = "Loading requests...";
-      const { data, error } = await supabaseClient
-        .from('requests')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const token = await getAuthToken();
+      if (!token) {
+        requestsMeta.textContent = "Session expired. Please log in again.";
+        return;
+      }
 
-      if (error) {
-        console.error(error);
+      const response = await fetch('/.netlify/functions/requests', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        console.error(await response.text());
         requestsMeta.textContent = "Failed to load requests.";
         return;
       }
 
-      renderRequests(data || []);
+      const data = await response.json();
+      renderRequests(Array.isArray(data) ? data : []);
     }
 
     async function updateStatus(id, status) {
-      const { error } = await supabaseClient
-        .from('requests')
-        .update({ status })
-        .eq('id', id);
+      const token = await getAuthToken();
+      if (!token) {
+        alert("Session expired. Please log in again.");
+        return;
+      }
 
-      if (error) {
+      const response = await fetch('/.netlify/functions/requests', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ id, status })
+      });
+
+      if (!response.ok) {
         alert("Failed to update status.");
-        console.error(error);
+        console.error(await response.text());
         return;
       }
 
@@ -297,14 +324,24 @@
     }
 
     async function deleteRequest(id) {
-      const { error } = await supabaseClient
-        .from('requests')
-        .delete()
-        .eq('id', id);
+      const token = await getAuthToken();
+      if (!token) {
+        alert("Session expired. Please log in again.");
+        return;
+      }
 
-      if (error) {
+      const response = await fetch('/.netlify/functions/requests', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ id })
+      });
+
+      if (!response.ok) {
         alert("Failed to delete request.");
-        console.error(error);
+        console.error(await response.text());
         return;
       }
 
