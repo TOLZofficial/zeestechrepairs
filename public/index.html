@@ -718,10 +718,19 @@
       const promoSeek = document.getElementById('promoSeek');
       const promoFull = document.getElementById('promoFull');
       const promoTime = document.getElementById('promoTime');
+      const promoControls = document.getElementById('promoControls');
 
       const syncPlayLabel = () => {
         promoPlay.textContent = promoVideo.paused ? 'Play' : 'Pause';
       };
+
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      if (isIOS) {
+        promoVideo.controls = true;
+        if (promoControls) {
+          promoControls.style.display = 'none';
+        }
+      }
 
       promoPlay.addEventListener('click', () => {
         if (promoVideo.paused) {
