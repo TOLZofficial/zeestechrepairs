@@ -324,6 +324,14 @@
       accent-color: var(--accent);
     }
 
+    .video-time {
+      font-size: 12px;
+      color: var(--muted);
+      min-width: 72px;
+      text-align: right;
+      letter-spacing: 0.04em;
+    }
+
     .contact .extra-box {
       background: rgba(15, 45, 61, 0.8);
       border: 1px solid rgba(0, 212, 212, 0.25);
@@ -562,11 +570,15 @@
         <video id="promoVideo" muted playsinline preload="metadata" poster="logo.png">
           <source src="promo-video.mp4" type="video/mp4">
           Your browser does not support the video tag.
+          <div class="hint">Press unmute to hear sound!</div>
+            
+        </div>
         </video>
         <div class="video-controls" id="promoControls">
           <button class="video-btn" type="button" id="promoPlay">Play</button>
           <button class="video-btn" type="button" id="promoMute">Mute</button>
           <input class="video-progress" type="range" id="promoSeek" min="0" max="100" value="0" />
+          <span class="video-time" id="promoTime">0:00 / 0:00</span>
           <button class="video-btn" type="button" id="promoFull">Full</button>
         </div>
       </div>
@@ -669,6 +681,7 @@
       const promoMute = document.getElementById('promoMute');
       const promoSeek = document.getElementById('promoSeek');
       const promoFull = document.getElementById('promoFull');
+      const promoTime = document.getElementById('promoTime');
 
       const syncPlayLabel = () => {
         promoPlay.textContent = promoVideo.paused ? 'Play' : 'Pause';
@@ -687,11 +700,28 @@
         promoMute.textContent = promoVideo.muted ? 'Mute' : 'Sound';
       });
 
+      const formatTime = (value) => {
+        if (!value || Number.isNaN(value)) {
+          return '0:00';
+        }
+        const minutes = Math.floor(value / 60);
+        const seconds = Math.floor(value % 60);
+        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      };
+
+      const syncTime = () => {
+        if (!promoTime) {
+          return;
+        }
+        promoTime.textContent = `${formatTime(promoVideo.currentTime)} / ${formatTime(promoVideo.duration)}`;
+      };
+
       promoVideo.addEventListener('timeupdate', () => {
         if (!promoVideo.duration || Number.isNaN(promoVideo.duration)) {
           return;
         }
         promoSeek.value = Math.round((promoVideo.currentTime / promoVideo.duration) * 100);
+        syncTime();
       });
 
       promoSeek.addEventListener('input', () => {
@@ -701,6 +731,7 @@
         promoVideo.currentTime = (promoSeek.value / 100) * promoVideo.duration;
       });
 
+      promoVideo.addEventListener('loadedmetadata', syncTime);
       promoVideo.addEventListener('play', syncPlayLabel);
       promoVideo.addEventListener('pause', syncPlayLabel);
       syncPlayLabel();
