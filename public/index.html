@@ -773,12 +773,17 @@
       promoVideo.addEventListener('pause', syncPlayLabel);
       syncPlayLabel();
 
-      if (promoFull && promoVideo.requestFullscreen) {
+      if (promoFull) {
         promoFull.addEventListener('click', () => {
-          promoVideo.requestFullscreen().catch(() => {});
+          if (promoVideo.requestFullscreen) {
+            promoVideo.requestFullscreen().catch(() => {});
+            return;
+          }
+          if (promoVideo.webkitEnterFullscreen) {
+            promoVideo.webkitEnterFullscreen();
+            return;
+          }
         });
-      } else if (promoFull) {
-        promoFull.style.display = 'none';
       }
 
       const videoObserver = new IntersectionObserver((entries) => {
