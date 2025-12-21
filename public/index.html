@@ -578,7 +578,7 @@
           <button class="video-btn" type="button" id="promoPlay">Play</button>
           <button class="video-btn" type="button" id="promoMute">Mute</button>
           <input class="video-progress" type="range" id="promoSeek" min="0" max="100" value="0" />
-          <span class="video-time" id="promoTime">0:00 / 0:00</span>
+          <span class="video-time" id="promoTime">-0:00</span>
           <button class="video-btn" type="button" id="promoFull">Full</button>
         </div>
       </div>
@@ -713,7 +713,8 @@
         if (!promoTime) {
           return;
         }
-        promoTime.textContent = `${formatTime(promoVideo.currentTime)} / ${formatTime(promoVideo.duration)}`;
+        const remaining = Math.max((promoVideo.duration || 0) - promoVideo.currentTime, 0);
+        promoTime.textContent = `-${formatTime(remaining)}`;
       };
 
       promoVideo.addEventListener('timeupdate', () => {
