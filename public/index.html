@@ -321,7 +321,12 @@
 
     .video-progress {
       flex: 1;
-      accent-color: var(--accent);
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(10, 35, 55, 0.9);
+      outline: none;
     }
 
     .video-time {
@@ -330,6 +335,39 @@
       min-width: 72px;
       text-align: right;
       letter-spacing: 0.04em;
+    }
+
+    .video-progress::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #2fd3ff;
+      box-shadow: 0 6px 18px rgba(47, 211, 255, 0.35);
+      border: 2px solid rgba(10, 35, 55, 0.9);
+    }
+
+    .video-progress::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #2fd3ff;
+      box-shadow: 0 6px 18px rgba(47, 211, 255, 0.35);
+      border: 2px solid rgba(10, 35, 55, 0.9);
+    }
+
+    .video-progress::-moz-range-track {
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(10, 35, 55, 0.9);
+    }
+
+    .video-hint {
+      padding: 10px 14px 14px;
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
     }
 
     .contact .extra-box {
@@ -570,9 +608,6 @@
         <video id="promoVideo" muted playsinline preload="metadata" poster="logo.png">
           <source src="promo-video.mp4" type="video/mp4">
           Your browser does not support the video tag.
-          <div class="hint">Press unmute to hear sound!</div>
-            
-        </div>
         </video>
         <div class="video-controls" id="promoControls">
           <button class="video-btn" type="button" id="promoPlay">Play</button>
@@ -581,6 +616,7 @@
           <span class="video-time" id="promoTime">-0:00</span>
           <button class="video-btn" type="button" id="promoFull">Full</button>
         </div>
+        <div class="video-hint">Press unmute to hear sound!</div>
       </div>
     </section>
 
