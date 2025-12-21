@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Login | Zee</title>
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: radial-gradient(circle at top, #11233b, #070d1a 70%);
+      color: #eef6ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .box {
+      background: rgba(7, 14, 28, 0.92);
+      padding: 28px;
+      border-radius: 16px;
+      width: min(360px, 90vw);
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(84, 143, 255, 0.2);
+      text-align: center;
+    }
+    h2 {
+      margin: 0 0 6px;
+      font-size: 22px;
+    }
+    p {
+      margin: 0 0 18px;
+      color: #b9c7de;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .actions {
+      margin-top: 18px;
+    }
+    button {
+      width: 100%;
+      padding: 10px 12px;
+      height: 44px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(135deg, #41caff, #5bffb0);
+      color: #021014;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(73, 215, 255, 0.25);
+    }
+    .hint {
+      margin-top: 12px;
+      font-size: 12px;
+      color: #9fb3cc;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Admin Login</h2>
+    <p>Sign in to manage repair requests.</p>
+    <form id="loginForm">
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" type="email" placeholder="you@example.com" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" placeholder="Enter your password" autocomplete="current-password" required>
+      </div>
+      <div class="actions">
+        <button type="submit">Login</button>
+      </div>
+    </form>
+    <div class="hint">Admins are managed in Supabase Auth.</div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const supabaseUrl = "https://vdtqfwnlhqokpedojjlw.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZkdHFmd25saHFva3BlZG9qamx3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYyNzI5OTEsImV4cCI6MjA4MTYzMjk5MX0.PnL3DZtt6LhnXxsExeGm20brR-4NEgh_ti5Pvkb6Ijc";
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+    const form = document.getElementById('loginForm');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const { error } = await supabaseClient.auth.signInWithPassword({
+        email: emailInput.value.trim(),
+        password: passwordInput.value
+      });
+
+      if (error) {
+        alert(error.message);
+        return;
+      }
+
+      window.location.href = "admin.html";
+    });
+  </script>
+</body>
+</html>
