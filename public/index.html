@@ -202,6 +202,10 @@
       transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
     }
 
+    .card.full-width {
+      grid-column: 1 / -1;
+    }
+
     .card:hover {
       transform: translateY(-8px) scale(1.02);
       box-shadow: 0 30px 60px rgba(0, 212, 212, 0.25);
@@ -405,6 +409,13 @@
         background: rgba(15, 45, 61, 0.7);
         box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
       }
+
+      .actions .btn,
+      .actions .btn.secondary {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -426,6 +437,7 @@
     <nav>
       <a href="tel:+447424905889">Call Us</a>
       <a href="#contact">Email</a>
+      <a href="#promo-video">Watch the advert</a>
       <a href="/login">Admin</a>
     </nav>
   </header>
@@ -495,7 +507,7 @@
           <h3>Laptop Loophole</h3>
           <p>Fixed a persistent issue with a Lenovo ThinkPad, resolving a problem where the laptop would not boot into the OS.</p>
         </div>
-        <div class="card">
+        <div class="card full-width">
           <h3>Fixing Bitlocker recovery</h3>
           <p>Fixed a BitLocker recovery issue on a Windows laptop, restoring access to encrypted data.</p>
         </div>
