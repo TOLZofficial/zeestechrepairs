@@ -238,6 +238,24 @@
       }
     }
 
+    .section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px 64px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .section-title {
+      margin: 0;
+    }
+
     .contact {
       margin-top: 40px;
       background: linear-gradient(120deg, rgba(0, 212, 212, 0.12), rgba(255, 110, 199, 0.12), rgba(127, 255, 176, 0.12));
@@ -251,10 +269,8 @@
       justify-content: space-between;
     }
 
-    .previous-work {
-      padding: 0 24px 64px;
-      max-width: 1100px;
-      margin: auto;
+    .contact-actions {
+      margin-top: 20px;
     }
 
     .video-card {
@@ -439,7 +455,7 @@
       </div>
     </div>
 
-    <section>
+    <section class="section">
       <h2>Services</h2>
       <div class="card-grid">
         <div class="card">
@@ -461,9 +477,9 @@
       </div>
     </section>
 
-    <section class="previous-work">
-      <div class="actions" style="justify-content: space-between; align-items: center;">
-        <h2 style="margin: 0;">Previous Work</h2>
+    <section class="previous-work section">
+      <div class="section-header">
+        <h2 class="section-title">Previous Work</h2>
         <a class="btn secondary" href="#promo-video">Watch the advert</a>
       </div>
       <div class="card-grid" style="margin-top: 24px;">
@@ -485,21 +501,21 @@
         </div>
       </div>
       <div class="video-card" id="promo-video">
-        <video id="promoVideo" controls muted playsinline preload="metadata" poster="logo.png">
+        <video id="promoVideo" controls muted playsinline preload="metadata" poster="favicon.png">
           <source src="promo-video.mp4" type="video/mp4">
           Your browser does not support the video tag.
         </video>
       </div>
     </section>
 
-    <section class="contact" id="contact">
+    <section class="contact section" id="contact">
       <div>
         <h3>Ready to schedule?</h3>
         <p style="margin: 4px 0 0; color: var(--muted);">Call or email and I'll confirm your slot.</p>
         <div class="extra-box">
           Email now to get a fast quote for a cheap price!
         </div>
-        <div class="actions" style="margin-top: 20px;">
+        <div class="actions contact-actions">
           <a class="btn secondary" href="sms:+447424905889?body=Hi%20Zee%27s%20Tech%20Repairs!%20I%20need%20a%20quote%20for%20a%20repair.">Text us (SMS/iMessage/RCS)</a>
         </div>
       </div>
