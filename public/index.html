@@ -626,6 +626,9 @@
             <input type="text" id="reviewDevice" name="review_device" placeholder="Device Type" required />
           </div>
           <div class="form-group">
+            <input type="text" id="reviewProblem" name="review_problem" placeholder="Problem / Issue" required />
+          </div>
+          <div class="form-group">
             <label for="reviewShare" style="font-size: 13px; font-weight: 600; color: var(--muted);">Would you like to share this review publicly?</label>
             <select id="reviewShare" name="review_share" required style="margin-top: 6px;">
               <option value="Yes">Yes</option>
@@ -1012,6 +1015,7 @@
         event.preventDefault();
         const name = document.getElementById('reviewName').value.trim();
         const device = document.getElementById('reviewDevice').value.trim();
+        const problem = document.getElementById('reviewProblem').value.trim();
         const rating = Number(reviewRating.value);
         const text = document.getElementById('reviewText').value.trim();
         const sharePermission = document.getElementById('reviewShare').value;
@@ -1024,6 +1028,7 @@
         const { error } = await supabaseClient.from('reviews').insert([{
           name: name || null,
           device,
+          problem,
           rating,
           text,
           share_permission: sharePermission,
@@ -1041,6 +1046,7 @@
             await emailjs.send('service_dnev7uf', reviewEmailTemplate, {
               name: name || 'Anonymous',
               device,
+              problem,
               rating,
               text,
               share_permission: sharePermission,
