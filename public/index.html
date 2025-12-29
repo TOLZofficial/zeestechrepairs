@@ -388,6 +388,15 @@
       transform: translateY(-1px);
     }
 
+    #reviewShare {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(0, 212, 212, 0.2);
+      background: rgba(12, 24, 44, 0.9);
+      color: var(--text);
+    }
+
     .contact .extra-box {
       background: rgba(15, 45, 61, 0.8);
       border: 1px solid rgba(0, 212, 212, 0.25);
@@ -615,6 +624,13 @@
           </div>
           <div class="form-group">
             <input type="text" id="reviewDevice" name="review_device" placeholder="Device Type" required />
+          </div>
+          <div class="form-group">
+            <label for="reviewShare" style="font-size: 13px; font-weight: 600; color: var(--muted);">Would you like to share this review publicly?</label>
+            <select id="reviewShare" name="review_share" required style="margin-top: 6px;">
+              <option value="Yes">Yes</option>
+              <option value="No" selected>No</option>
+            </select>
           </div>
           <div class="form-group">
             <div style="display: flex; align-items: center; gap: 10px;">
@@ -998,6 +1014,7 @@
         const device = document.getElementById('reviewDevice').value.trim();
         const rating = Number(reviewRating.value);
         const text = document.getElementById('reviewText').value.trim();
+        const sharePermission = document.getElementById('reviewShare').value;
 
         if (!rating) {
           alert('Please choose a star rating.');
@@ -1009,6 +1026,7 @@
           device,
           rating,
           text,
+          share_permission: sharePermission,
           status: 'Pending'
         }]);
 
@@ -1025,6 +1043,7 @@
               device,
               rating,
               text,
+              share_permission: sharePermission,
               to_email: 'contact@zeestechrepairs.com'
             });
           } catch (emailError) {

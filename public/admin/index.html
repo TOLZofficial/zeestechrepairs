@@ -310,6 +310,7 @@
 
         addLine('Device', review.device);
         addLine('Rating', `${review.rating || 0} / 5`);
+        addLine('Share', review.share_permission || 'No');
         addLine('Review', review.text);
         addLine('Created', formatDate(review.created_at));
 
