@@ -370,6 +370,24 @@
       text-align: center;
     }
 
+    .star-btn {
+      appearance: none;
+      border: none;
+      background: rgba(15, 45, 61, 0.7);
+      color: rgba(232, 244, 248, 0.6);
+      padding: 6px 10px;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.2s, color 0.2s, box-shadow 0.2s;
+    }
+
+    .star-btn.is-active {
+      color: #ffdd75;
+      box-shadow: 0 10px 20px rgba(255, 221, 117, 0.25);
+      transform: translateY(-1px);
+    }
+
     .contact .extra-box {
       background: rgba(15, 45, 61, 0.8);
       border: 1px solid rgba(0, 212, 212, 0.25);
@@ -583,22 +601,41 @@
 
     <section class="section" id="reviews">
       <h2>Reviews</h2>
-      <div class="card-grid">
+      <div class="card-grid" id="reviewsGrid">
         <div class="card">
-          <h3>“Fast and honest.”</h3>
-          <p>Got my phone screen replaced the same day. Clear price and friendly service.</p>
-          <p style="margin-top: 12px; color: var(--accent-3); font-weight: 700;">— Amina K.</p>
+          <h3>Be the first to leave a review</h3>
+          <p>Your feedback helps others choose Zee's Tech Repairs.</p>
         </div>
-        <div class="card">
-          <h3>“Saved my laptop.”</h3>
-          <p>Battery and startup issues fixed within hours. Highly recommend Zee.</p>
-          <p style="margin-top: 12px; color: var(--accent-3); font-weight: 700;">— James L.</p>
-        </div>
-        <div class="card">
-          <h3>“Great communication.”</h3>
-          <p>Updates throughout the repair and everything explained clearly.</p>
-          <p style="margin-top: 12px; color: var(--accent-3); font-weight: 700;">— Priya S.</p>
-        </div>
+      </div>
+      <div class="card" style="margin-top: 24px;">
+        <h3>Leave a review</h3>
+        <form id="reviewForm" style="display: grid; gap: 12px;">
+          <div class="form-group">
+            <input type="text" id="reviewName" name="review_name" placeholder="Your Name (optional)" />
+          </div>
+          <div class="form-group">
+            <input type="text" id="reviewDevice" name="review_device" placeholder="Device Type" required />
+          </div>
+          <div class="form-group">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="font-weight: 600;">Rating</span>
+              <div id="reviewStars" style="display: flex; gap: 6px;">
+                <button type="button" class="star-btn" data-value="1">★</button>
+                <button type="button" class="star-btn" data-value="2">★</button>
+                <button type="button" class="star-btn" data-value="3">★</button>
+                <button type="button" class="star-btn" data-value="4">★</button>
+                <button type="button" class="star-btn" data-value="5">★</button>
+              </div>
+              <span id="reviewRatingLabel" style="color: var(--muted);">Select</span>
+            </div>
+            <input type="hidden" id="reviewRating" name="review_rating" required />
+          </div>
+          <div class="form-group">
+            <textarea id="reviewText" name="review_text" placeholder="Write your review..." required></textarea>
+          </div>
+          <button type="submit" class="btn" style="width: fit-content;">Submit review</button>
+          <p style="margin: 0; color: var(--muted); font-size: 13px;">Reviews appear after admin approval.</p>
+        </form>
       </div>
     </section>
 
@@ -690,6 +727,7 @@
     const supabaseUrl = "https://vdtqfwnlhqokpedojjlw.supabase.co";
     const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZkdHFmd25saHFva3BlZG9qamx3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYyNzI5OTEsImV4cCI6MjA4MTYzMjk5MX0.PnL3DZtt6LhnXxsExeGm20brR-4NEgh_ti5Pvkb6Ijc";
     const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+    const reviewEmailTemplate = "";
 
     document.getElementById('year').textContent = new Date().getFullYear();
 
@@ -885,6 +923,126 @@
         console.error('Supabase error:', error);
       }
     });
+
+    const reviewsGrid = document.getElementById('reviewsGrid');
+    const reviewForm = document.getElementById('reviewForm');
+    const reviewStars = document.getElementById('reviewStars');
+    const reviewRating = document.getElementById('reviewRating');
+    const reviewRatingLabel = document.getElementById('reviewRatingLabel');
+
+    const renderReviews = (reviews) => {
+      if (!reviewsGrid) {
+        return;
+      }
+      reviewsGrid.innerHTML = "";
+
+      if (!reviews.length) {
+        reviewsGrid.innerHTML = `
+          <div class="card">
+            <h3>Be the first to leave a review</h3>
+            <p>Your feedback helps others choose Zee's Tech Repairs.</p>
+          </div>
+        `;
+        return;
+      }
+
+      reviews.forEach((review) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        const name = review.name ? `— ${review.name}` : '— Anonymous';
+        const stars = '★'.repeat(review.rating || 0).padEnd(5, '☆');
+
+        card.innerHTML = `
+          <h3>${stars}</h3>
+          <p>${review.text || ''}</p>
+          <p style="margin-top: 12px; color: var(--accent-3); font-weight: 700;">${name}</p>
+        `;
+        reviewsGrid.appendChild(card);
+      });
+    };
+
+    const loadReviews = async () => {
+      const { data, error } = await supabaseClient
+        .from('reviews')
+        .select('*')
+        .eq('status', 'Approved')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Reviews load error:', error);
+        return;
+      }
+      renderReviews(data || []);
+    };
+
+    if (reviewStars) {
+      reviewStars.addEventListener('click', (event) => {
+        const button = event.target.closest('.star-btn');
+        if (!button) {
+          return;
+        }
+        const value = Number(button.dataset.value);
+        reviewRating.value = value;
+        reviewRatingLabel.textContent = `${value} star${value === 1 ? '' : 's'}`;
+        reviewStars.querySelectorAll('.star-btn').forEach((star) => {
+          const starValue = Number(star.dataset.value);
+          star.classList.toggle('is-active', starValue <= value);
+        });
+      });
+    }
+
+    if (reviewForm) {
+      reviewForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const name = document.getElementById('reviewName').value.trim();
+        const device = document.getElementById('reviewDevice').value.trim();
+        const rating = Number(reviewRating.value);
+        const text = document.getElementById('reviewText').value.trim();
+
+        if (!rating) {
+          alert('Please choose a star rating.');
+          return;
+        }
+
+        const { error } = await supabaseClient.from('reviews').insert([{
+          name: name || null,
+          device,
+          rating,
+          text,
+          status: 'Pending'
+        }]);
+
+        if (error) {
+          alert('Failed to submit review. Please try again.');
+          console.error('Review submit error:', error);
+          return;
+        }
+
+        if (reviewEmailTemplate) {
+          try {
+            await emailjs.send('service_dnev7uf', reviewEmailTemplate, {
+              name: name || 'Anonymous',
+              device,
+              rating,
+              text,
+              to_email: 'contact@zeestechrepairs.com'
+            });
+          } catch (emailError) {
+            console.error('Review EmailJS error:', emailError);
+          }
+        }
+
+        alert('Thanks! Your review is pending approval.');
+        reviewForm.reset();
+        reviewRating.value = '';
+        reviewRatingLabel.textContent = 'Select';
+        reviewStars.querySelectorAll('.star-btn').forEach((star) => {
+          star.classList.remove('is-active');
+        });
+      });
+    }
+
+    loadReviews();
   </script>
 </body>
 </html>

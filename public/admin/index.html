@@ -173,6 +173,12 @@
       <p id="requestsMeta">Loading requests...</p>
       <div id="requests" class="requests"></div>
     </div>
+
+    <div class="card">
+      <h3>Reviews</h3>
+      <p id="reviewsMeta">Loading reviews...</p>
+      <div id="reviews" class="requests"></div>
+    </div>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -181,6 +187,8 @@
     const logoutBtn = document.getElementById('logoutBtn');
     const requestsEl = document.getElementById('requests');
     const requestsMeta = document.getElementById('requestsMeta');
+    const reviewsEl = document.getElementById('reviews');
+    const reviewsMeta = document.getElementById('reviewsMeta');
 
     function formatDate(value) {
       if (!value) {
@@ -260,6 +268,76 @@
       });
     }
 
+    function renderReviews(reviews) {
+      reviewsEl.innerHTML = "";
+
+      if (!reviews.length) {
+        reviewsMeta.textContent = "No reviews yet.";
+        return;
+      }
+
+      reviewsMeta.textContent = `${reviews.length} review(s) total.`;
+
+      reviews.forEach((review) => {
+        const card = document.createElement('div');
+        card.className = 'request';
+
+        const header = document.createElement('div');
+        header.className = 'request-header';
+
+        const title = document.createElement('strong');
+        title.textContent = review.name || 'Anonymous';
+
+        const status = document.createElement('span');
+        const statusValue = (review.status || 'Pending').toLowerCase();
+        status.className = `status ${statusValue === 'approved' ? 'completed' : 'pending'}`;
+        status.textContent = review.status || 'Pending';
+
+        header.appendChild(title);
+        header.appendChild(status);
+
+        const meta = document.createElement('div');
+        meta.className = 'request-meta';
+
+        const addLine = (label, value) => {
+          const line = document.createElement('span');
+          const strong = document.createElement('strong');
+          strong.textContent = `${label}:`;
+          line.appendChild(strong);
+          line.append(` ${value || 'N/A'}`);
+          meta.appendChild(line);
+        };
+
+        addLine('Device', review.device);
+        addLine('Rating', `${review.rating || 0} / 5`);
+        addLine('Review', review.text);
+        addLine('Created', formatDate(review.created_at));
+
+        const actions = document.createElement('div');
+        actions.className = 'request-actions';
+
+        const approveBtn = document.createElement('button');
+        approveBtn.className = 'secondary';
+        approveBtn.textContent = 'Approve';
+        approveBtn.dataset.action = 'approve';
+        approveBtn.dataset.id = review.id;
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'danger';
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.dataset.action = 'delete';
+        deleteBtn.dataset.id = review.id;
+
+        actions.appendChild(approveBtn);
+        actions.appendChild(deleteBtn);
+
+        card.appendChild(header);
+        card.appendChild(meta);
+        card.appendChild(actions);
+        reviewsEl.appendChild(card);
+      });
+    }
+
     const supabaseUrl = "https://vdtqfwnlhqokpedojjlw.supabase.co";
     const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZkdHFmd25saHFva3BlZG9qamx3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYyNzI5OTEsImV4cCI6MjA4MTYzMjk5MX0.PnL3DZtt6LhnXxsExeGm20brR-4NEgh_ti5Pvkb6Ijc";
     const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
@@ -278,6 +356,22 @@
       }
 
       renderRequests(data || []);
+    }
+
+    async function loadReviews() {
+      reviewsMeta.textContent = "Loading reviews...";
+      const { data, error } = await supabaseClient
+        .from('reviews')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error(error);
+        reviewsMeta.textContent = "Failed to load reviews.";
+        return;
+      }
+
+      renderReviews(data || []);
     }
 
     async function updateStatus(id, status) {
@@ -310,6 +404,36 @@
       loadRequests();
     }
 
+    async function approveReview(id) {
+      const { error } = await supabaseClient
+        .from('reviews')
+        .update({ status: 'Approved' })
+        .eq('id', id);
+
+      if (error) {
+        alert("Failed to approve review.");
+        console.error(error);
+        return;
+      }
+
+      loadReviews();
+    }
+
+    async function deleteReview(id) {
+      const { error } = await supabaseClient
+        .from('reviews')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        alert("Failed to delete review.");
+        console.error(error);
+        return;
+      }
+
+      loadReviews();
+    }
+
     supabaseClient.auth.getUser().then(({ data }) => {
       if (!data || !data.user) {
         window.location.href = "/login";
@@ -317,6 +441,7 @@
       }
       emailEl.textContent = data.user.email || "Signed in";
       loadRequests();
+      loadReviews();
     });
 
     logoutBtn.addEventListener('click', async () => {
@@ -339,6 +464,25 @@
       } else if (button.dataset.action === 'delete') {
         if (confirm('Delete this request?')) {
           deleteRequest(id);
+        }
+      }
+    });
+
+    reviewsEl.addEventListener('click', (event) => {
+      const button = event.target.closest('button');
+      if (!button) {
+        return;
+      }
+      const id = button.dataset.id;
+      if (!id) {
+        return;
+      }
+
+      if (button.dataset.action === 'approve') {
+        approveReview(id);
+      } else if (button.dataset.action === 'delete') {
+        if (confirm('Delete this review?')) {
+          deleteReview(id);
         }
       }
     });
