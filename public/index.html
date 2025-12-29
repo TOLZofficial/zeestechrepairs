@@ -397,6 +397,36 @@
       color: var(--text);
     }
 
+    .toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      background: rgba(12, 24, 44, 0.95);
+      color: var(--text);
+      border: 1px solid rgba(0, 212, 212, 0.25);
+      padding: 12px 16px;
+      border-radius: 12px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+      z-index: 1200;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      max-width: 260px;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .toast.success {
+      border-color: rgba(127, 255, 176, 0.5);
+    }
+
+    .toast.error {
+      border-color: rgba(255, 110, 199, 0.6);
+    }
+
     .contact .extra-box {
       background: rgba(15, 45, 61, 0.8);
       border: 1px solid rgba(0, 212, 212, 0.25);
@@ -887,6 +917,22 @@
       videoObserver.observe(promoVideo);
     }
 
+    const showToast = (message, variant = 'success') => {
+      let toast = document.getElementById('toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'toast';
+        toast.className = 'toast';
+        document.body.appendChild(toast);
+      }
+      toast.textContent = message;
+      toast.className = `toast show ${variant}`;
+      clearTimeout(showToast._timer);
+      showToast._timer = setTimeout(() => {
+        toast.className = 'toast';
+      }, 3000);
+    };
+
     document.querySelectorAll('a[href^=\"#\"]').forEach((link) => {
       link.addEventListener('click', (event) => {
         const target = document.querySelector(link.getAttribute('href'));
@@ -929,16 +975,16 @@
             phone
           });
         } catch (emailError) {
-          alert('Saved your request, but failed to send the email notification.');
+          showToast('Saved, but email notification failed.', 'error');
           console.error('EmailJS error:', emailError);
           document.getElementById('contactForm').reset();
           return;
         }
 
-        alert('Message sent successfully!');
+        showToast('Message sent successfully!');
         document.getElementById('contactForm').reset();
       } catch (error) {
-        alert('Failed to save your request. Please try again.');
+        showToast('Failed to send. Please try again.', 'error');
         console.error('Supabase error:', error);
       }
     });
@@ -1021,7 +1067,7 @@
         const sharePermission = document.getElementById('reviewShare').value;
 
         if (!rating) {
-          alert('Please choose a star rating.');
+          showToast('Please choose a star rating.', 'error');
           return;
         }
 
@@ -1036,7 +1082,7 @@
         }]);
 
         if (error) {
-          alert('Failed to submit review. Please try again.');
+          showToast('Failed to submit review.', 'error');
           console.error('Review submit error:', error);
           return;
         }
@@ -1057,7 +1103,7 @@
           }
         }
 
-        alert('Thanks! Your review is pending approval.');
+        showToast('Thanks! Your review is pending approval.');
         reviewForm.reset();
         reviewRating.value = '';
         reviewRatingLabel.textContent = 'Select';
@@ -1071,3 +1117,4 @@
   </script>
 </body>
 </html>
+
