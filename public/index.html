@@ -607,6 +607,7 @@
     <nav>
       <a href="tel:+447424905889">Call me</a>
       <a href="#contact">Email</a>
+      <a href="/reviews">Reviews</a>
       <a href="#promo-video">Watch the advert</a>
       <a href="/login">Admin</a>
     </nav>
@@ -1041,6 +1042,7 @@
         card.innerHTML = `
           <h3>${stars}</h3>
           <p>${review.text || ''}</p>
+          <p style="margin: 10px 0 0; color: var(--muted);">${device}${device && problem ? ' · ' : ''}${problem}</p>
           <p style="margin-top: 12px; color: var(--accent-3); font-weight: 700;">${name}</p>
         `;
         reviewsGrid.appendChild(card);
@@ -1138,4 +1140,5 @@
   </script>
 </body>
 </html>
+
 
