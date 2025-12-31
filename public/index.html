@@ -668,6 +668,9 @@
           <p>Your feedback helps others choose Zee's Tech Repairs.</p>
         </div>
       </div>
+      <div class="actions" style="margin-top: 18px;">
+        <a class="btn secondary" href="/reviews">See more reviews</a>
+      </div>
       <div class="card" style="margin-top: 24px;">
         <h3>Leave a review</h3>
         <form id="reviewForm" style="display: grid; gap: 12px;">
@@ -691,11 +694,11 @@
             <div style="display: flex; align-items: center; gap: 10px;">
               <span style="font-weight: 600;">Rating</span>
               <div id="reviewStars" style="display: flex; gap: 6px;">
-                <button type="button" class="star-btn" data-value="1">★</button>
-                <button type="button" class="star-btn" data-value="2">★</button>
-                <button type="button" class="star-btn" data-value="3">★</button>
-                <button type="button" class="star-btn" data-value="4">★</button>
-                <button type="button" class="star-btn" data-value="5">★</button>
+                <button type="button" class="star-btn" data-value="1">&#9733;</button>
+                <button type="button" class="star-btn" data-value="2">&#9733;</button>
+                <button type="button" class="star-btn" data-value="3">&#9733;</button>
+                <button type="button" class="star-btn" data-value="4">&#9733;</button>
+                <button type="button" class="star-btn" data-value="5">&#9733;</button>
               </div>
               <span id="reviewRatingLabel" style="color: var(--muted);">Select</span>
             </div>
@@ -1034,15 +1037,19 @@
       }
 
       reviews.forEach((review) => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        const name = review.name ? `— ${review.name}` : '— Anonymous';
-        const stars = '★'.repeat(review.rating || 0).padEnd(5, '☆');
+        const card = document.createElement("div");
+        card.className = "card";
+        const name = review.name ? `- ${review.name}` : '- Anonymous';
+        const rating = Number(review.rating) || 0;
+        const stars = `${'&#9733;'.repeat(rating)}${'&#9734;'.repeat(Math.max(0, 5 - rating))}`;
+        const device = review.device ? `Device: ${review.device}` : '';
+        const problem = review.problem ? `Issue: ${review.problem}` : '';
+        const meta = device && problem ? `${device} &middot; ${problem}` : (device || problem);
 
         card.innerHTML = `
           <h3>${stars}</h3>
-          <p>${review.text || ''}</p>
-          <p style="margin: 10px 0 0; color: var(--muted);">${device}${device && problem ? ' · ' : ''}${problem}</p>
+          <p>${review.text || 'Great service and support.'}</p>
+          <p style="margin: 10px 0 0; color: var(--muted);">${meta}</p>
           <p style="margin-top: 12px; color: var(--accent-3); font-weight: 700;">${name}</p>
         `;
         reviewsGrid.appendChild(card);
@@ -1140,5 +1147,8 @@
   </script>
 </body>
 </html>
+
+
+
 
 

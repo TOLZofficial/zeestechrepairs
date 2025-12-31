@@ -103,6 +103,17 @@
       border: 1px solid rgba(47, 255, 220, 0.08);
     }
 
+    .reveal {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
     .card h3 {
       margin-top: 0;
       color: #2fffdc;
@@ -190,6 +201,25 @@
     const reviewsEl = document.getElementById('reviews');
     const reviewsMeta = document.getElementById('reviewsMeta');
 
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) {
+          return;
+        }
+        entry.target.classList.add('is-visible');
+        revealObserver.unobserve(entry.target);
+      });
+    }, { threshold: 0.2 });
+
+    const applyRevealTargets = () => {
+      document.querySelectorAll('header, .card, .request').forEach((el) => {
+        if (!el.classList.contains('reveal')) {
+          el.classList.add('reveal');
+        }
+        revealObserver.observe(el);
+      });
+    };
+
     function formatDate(value) {
       if (!value) {
         return "Unknown time";
@@ -266,6 +296,7 @@
         card.appendChild(actions);
         requestsEl.appendChild(card);
       });
+      applyRevealTargets();
     }
 
     function renderReviews(reviews) {
@@ -338,6 +369,7 @@
         card.appendChild(actions);
         reviewsEl.appendChild(card);
       });
+      applyRevealTargets();
     }
 
     const supabaseUrl = "https://vdtqfwnlhqokpedojjlw.supabase.co";
@@ -488,6 +520,8 @@
         }
       }
     });
+
+    applyRevealTargets();
   </script>
 <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1c5ec302dc85429dae72a3c93e17b566"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
