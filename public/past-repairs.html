@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Past Repairs | Zee's Tech Repairs</title>
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <style>
+    :root {
+      --bg: #0a1f2e;
+      --panel: #0f2d3d;
+      --accent: #00d4d4;
+      --accent-2: #ff6ec7;
+      --accent-3: #7fffb0;
+      --text: #e8f4f8;
+      --muted: #a0c4d4;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #051a24, var(--bg));
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px;
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    .brand {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .brand img {
+      border-radius: 12px;
+      object-fit: cover;
+      box-shadow: 0 4px 12px rgba(0, 212, 212, 0.2);
+    }
+
+    nav a {
+      color: var(--text);
+      text-decoration: none;
+      margin-left: 16px;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+
+    nav a:hover { color: var(--accent); }
+
+    main {
+      max-width: 1100px;
+      margin: auto;
+      padding: 0 24px 64px;
+    }
+
+    h1 {
+      font-size: clamp(28px, 4vw, 40px);
+      margin: 0 0 12px;
+    }
+
+    p {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+    }
+
+    .filter {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filter button {
+      border: 1px solid rgba(0, 212, 212, 0.3);
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(15, 45, 61, 0.7);
+      color: var(--text);
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    }
+
+    .filter button:hover {
+      transform: translateY(-2px);
+      border-color: rgba(0, 212, 212, 0.6);
+      box-shadow: 0 10px 24px rgba(0, 212, 212, 0.2);
+    }
+
+    .filter button.active {
+      background: linear-gradient(135deg, rgba(0, 212, 212, 0.4), rgba(127, 255, 176, 0.4));
+      color: #041017;
+      border-color: transparent;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+      margin-top: 24px;
+    }
+
+    .card {
+      background: linear-gradient(135deg, rgba(0, 212, 212, 0.08), rgba(127, 255, 176, 0.08));
+      border: 1px solid rgba(0, 212, 212, 0.2);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+      transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 30px 60px rgba(0, 212, 212, 0.3);
+      border-color: var(--accent-2);
+    }
+
+    .card video {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      display: block;
+      background: #050c12;
+    }
+
+    .card-body {
+      padding: 16px 18px 18px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .card-body h3 {
+      margin: 0;
+      background: linear-gradient(135deg, var(--accent), var(--accent-3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(0, 212, 212, 0.2), rgba(127, 255, 176, 0.2));
+      color: var(--accent-3);
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      font-size: 11px;
+      width: fit-content;
+    }
+
+    .meta {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .note {
+      margin-top: 24px;
+      padding: 16px 18px;
+      border-radius: 14px;
+      background: rgba(15, 45, 61, 0.8);
+      border: 1px solid rgba(0, 212, 212, 0.25);
+      color: var(--muted);
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      padding: 32px 0 12px;
+    }
+
+    @media (max-width: 600px) {
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+      }
+      nav a {
+        margin: 0;
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(0, 212, 212, 0.3);
+        background: rgba(15, 45, 61, 0.7);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
+      }
+    }
+
+    @media (min-width: 601px) {
+      nav a {
+        padding: 6px 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(0, 212, 212, 0.18);
+        background: rgba(8, 28, 38, 0.6);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
+      }
+      nav a:hover {
+        border-color: rgba(0, 212, 212, 0.5);
+        box-shadow: 0 14px 30px rgba(0, 212, 212, 0.25);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <img src="logo.png" alt="Zee's Tech Repairs" width="48" height="48" />
+      <span>Zee's Tech Repairs</span>
+    </div>
+    <nav>
+      <a href="/index.html">Home</a>
+      <a href="/reviews">Reviews</a>
+      <a href="/past-repairs.html">Past repairs</a>
+      <a href="/login">Admin</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Past repairs</h1>
+    <p>Short video recaps of real fixes, ready to show customers what we can do.</p>
+
+    <div class="header-row">
+      <div class="filter" role="tablist">
+        <button class="active" data-filter="all">All</button>
+        <button data-filter="phone">Phones</button>
+        <button data-filter="laptop">Laptops</button>
+        <button data-filter="console">Consoles</button>
+      </div>
+    </div>
+
+    <div class="card-grid" id="repairsGrid"></div>
+
+    <!-- Hint for VSCode: add new videos by editing the repairsData array in the script below. -->
+    <!-- Tip: Drop your MP4s into <strong>public</strong> and add them to the list below. -->
+    <!-- The page auto-builds each card. -->
+  </main>
+
+  <footer>
+    &copy; <span id="year"></span> Zee's Tech Repairs - Rapid, reliable fixes.
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    // VSCode hint: add more MP4s here. Just copy a block and update the fields.
+    // Example:
+    // {
+    //   id: "new-job",
+    //   title: "iPhone 12 screen + frame swap",
+    //   type: "phone",
+    //   date: "Feb 2026",
+    //   issue: "Cracked OLED and bent frame",
+    //   result: "Full display restored, frame aligned",
+    //   video: "your-video-file.mp4"
+    // }
+    const repairsData = [
+      {
+        id: "bit-locker",
+        title: "BitLocker recovery on Dynabook laptop",
+        type: "laptop",
+        date: "Nov 2025",
+        issue: "System locked by BitLocker",
+        result: "Boots normally into Windows, data intact",
+        video: "promo-video.mp4"
+      }
+    ];
+
+    const grid = document.getElementById("repairsGrid");
+    const buttons = Array.from(document.querySelectorAll(".filter button"));
+
+    const renderCards = (items) => {
+      grid.innerHTML = items.map((repair) => `
+        <article class="card" data-type="${repair.type}">
+          <video controls preload="metadata">
+            <source src="${repair.video}" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+          <div class="card-body">
+            <span class="badge">${repair.date}</span>
+            <h3>${repair.title}</h3>
+            <div class="meta">
+              <span>Issue: ${repair.issue}</span>
+              <span>Result: ${repair.result}</span>
+            </div>
+          </div>
+        </article>
+      `).join("");
+    };
+
+    const setFilter = (filter) => {
+      buttons.forEach((btn) => btn.classList.toggle("active", btn.dataset.filter === filter));
+      if (filter === "all") {
+        renderCards(repairsData);
+        return;
+      }
+      renderCards(repairsData.filter((item) => item.type === filter));
+    };
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => setFilter(button.dataset.filter));
+    });
+
+    renderCards(repairsData);
+  </script>
+</body>
+</html>
